@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      target: http-server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+  socket:
+    build:
+      context: .
+      target: socket-server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
