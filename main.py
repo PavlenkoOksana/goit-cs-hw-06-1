@@ -1,12 +1,17 @@
 import mimetypes
 import pathlib
+from multiprocessing import Process
+import socket
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
 import socket
 import threading
 import json
 from datetime import datetime
+import pymongo
 from pymongo import MongoClient
+
+client = pymongo.MongoClient("mongodb://db:27017/")
 
 class HttpHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -72,6 +77,7 @@ def send_to_socket_server(data_dict):
     except Exception as e:
         print(f"Error sending data to socket server: {e}")
 
+
 def start_socket_server():
     mongo_host = 'localhost'
     mongo_port = 27017
@@ -113,7 +119,9 @@ def start_socket_server():
     server_socket.close()
 
 if __name__ == '__main__':
-    http_thread = threading.Thread(target=run_http_server)
-    http_thread.start()
-
-    start_socket_server()
+    process1 = Process(target=run_http_server)
+    process2 = Process(target=start_socket_server)
+    process1.start()
+    process2.start()
+    process1.join()
+    process2.join()
